@@ -108,3 +108,16 @@ i.circular.icon {
 .blurring.dimmed.dimmable>:not(.dimmer):not(.ui.popup) {
   filter: blur(5px) grayscale(.7);
 }
+
+.refresh-icon:hover {
+    color: green !important;
+    cursor: pointer;
+}
+
+.prevtx-segment:hover {
+  cursor: pointer;
+}
+
+.prevtx-segment.ui.segment:hover {
+  background: rgba(133,133,133,.5) !important;
+}

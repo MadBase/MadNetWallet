@@ -8,6 +8,7 @@ import BlockExplorer from './madnet/blockExplorer.js';
 import TxExplorer from './madnet/txExplorer.js';
 import Transacton from './madnet/transaction.js';
 import BlockModal from './madnet/blockModal.js';
+import PrevTx from './madnet/prevTx.jsx';
 
 
 function MadNet(props) {
@@ -30,7 +31,7 @@ function MadNet(props) {
         }
     }
 
-    // Updates for when component mounts or updates
+    // // Updates for when component mounts or updates
     useEffect(() => {
         // Reset this component to orginal state
         if (props.states.refresh) {
@@ -104,6 +105,8 @@ function MadNet(props) {
                 return (<TxExplorer states={props.states} />);;
             case 'dataExplorer':
                 return (<DataExplorer states={props.states} />);;
+            case 'prevTx':
+                return (<PrevTx states={props.states} />);;
             default:
                 return (<></>);;
         }
@@ -118,6 +121,7 @@ function MadNet(props) {
             <Button onClick={() => addAdapter(true)}>Reconnect</Button>
         )
     }
+
     else {
         return (
             <>
@@ -132,6 +136,11 @@ function MadNet(props) {
                         name="blockExplorer"
                         active={props.states.activeMadnetPanel === 'blockExplorer'}
                         onClick={() => props.states.setMadnetPanel("blockExplorer")}
+                    />
+                    <Menu.Item
+                        name="prevTx"
+                        active={props.states.activeMadnetPanel === 'prevTx'}
+                        onClick={() => props.states.setMadnetPanel("prevTx")}
                     />
                     <Menu.Item
                         name="txExplorer"
