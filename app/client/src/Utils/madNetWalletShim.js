@@ -63,6 +63,3 @@ export async function prevTransactions(madWallet, addresses) {
     }
 }
 
-// Inline Tests...
-// getBalance("c0ffeeD1835620b81fb8d0cAD1098cE210F739e9", 1)
-// prevTransactions([{ address: "c0ffeeD1835620b81fb8d0cAD1098cE210F739e9", curve: 1 }]);
