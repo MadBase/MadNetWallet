@@ -39,6 +39,7 @@ function App() {
   const [activeMadnetPanel, setMadnetPanel] = useState(false);
   const [activePanel, setPanel] = useState("accounts");
   const [style, setStyle] = useState("dark");
+  const [forwardLookupTx, setForwardLookupTx] = useState(false);
   const madnetSetup = useRef(false);
 
   // Object for the props to be used in childern components
@@ -63,7 +64,9 @@ function App() {
     setBlockModal,
     activeMadnetPanel,
     setMadnetPanel,
-    copyText
+    copyText,
+    forwardLookupTx,
+    setForwardLookupTx,
   }
 
   return (

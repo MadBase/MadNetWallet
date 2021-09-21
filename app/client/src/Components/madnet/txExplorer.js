@@ -12,6 +12,15 @@ function TransactionExplorer(props) {
     const [rawVin, setRawVin] = useState(false);
     const [rawVout, setRawVout] = useState(false);
 
+    const [performedLookup, setPerformedLookup] = React.useState(false);
+
+    // If a forwarded inspection exists, set it, then run it and clear forward inspection state
+    React.useEffect(() => {
+        if (props.states.forwardLookupTx) {
+            handleSubmit(new Event("NullEvent"), props.states.forwardLookupTx)
+        }
+    })
+
     // Update Vin/Vout
     const handleChange = (event, e) => {
         if (e === "rawVin") {
@@ -26,10 +35,14 @@ function TransactionExplorer(props) {
     }
 
     // Sumbit initial query params
-    const handleSubmit = (event) => {
+    const handleSubmit = (event, forceSpecificHash) => {
         event.preventDefault()
-        store.madNetAdapter.viewTransaction(txHash);
+        store.madNetAdapter.viewTransaction(forceSpecificHash ? forceSpecificHash : txHash);
+        if (!!forceSpecificHash) { // If we were forwarded a force, clear it next
+            props.states.setForwardLookupTx(false);
+        }
     }
+
 
     // Vin objects
     const vin = (data) => {

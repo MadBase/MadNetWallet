@@ -3,6 +3,7 @@ import { StoreContext } from "../../Store/store.js";
 import { Container, Button, Form, Icon, Card, Grid, Segment } from 'semantic-ui-react';
 import Switch from "react-switch";
 import Help from '../help.js';
+import BalanceDisplay from '../BalanceDisplay.jsx';
 
 function Transaction(props) {
     // Store states
@@ -118,6 +119,7 @@ function Transaction(props) {
                         onChange={(event, v) => { handleChange(event, i, "fromAddress", v) }}
                     />
                 </Form.Field>
+                <div style={{position:"relative", top: "-6px"}}><BalanceDisplay hideRefresh address={store.madNetAdapter.txOuts[i]["fromAddress"]} /></div>
                 <Form.Field>
                     <label>Value{<Help type='value' />}</label>
                     <Form.Input value={store.madNetAdapter.txOuts[i]["value"]} onChange={(event) => { handleChange(event, i, "value") }} placeholder="1"></Form.Input>

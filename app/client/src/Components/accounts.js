@@ -1,18 +1,25 @@
 import React, { useContext, useState } from 'react';
 import { StoreContext } from "../Store/store.js";
+import MadNetAdapter from "../Utils/madNetAdapter.js";
 import { Container, Grid, Form, Input, Segment, Button, Divider, Icon, Rail, Modal } from "semantic-ui-react"
 import Switch from "react-switch";
 import Accts from '../Utils/accounts.js';
+import BalanceDisplay from '../Components/BalanceDisplay';
 
 function Accounts(props) {
-    // Store states and actions to update state
-    const { store } = useContext(StoreContext);
+    // Store states and actions to update statebalance:
+    const { store, actions } = useContext(StoreContext);
     // Keystore json and password
     const [keystoreData, addKeystoreData] = useState({ "keystore": false, "password": "", "fileName": false });
     // private key and curve
     const [privKData, addPrivKData] = useState({ "privK": "", "curve": false })
     // create keystore
     const [changeKSData, addChangeKSData] = useState({ "passwordConfirm": "", "password": "", "curve": false, "keystore": false })
+
+    // Update madnet adapter
+    const update = React.useRef(false)
+    // Check if madnet adapter connected
+    const connectAttempt = React.useRef(false);
 
     // create new keystore modal
     const [open, setOpen] = React.useState(false)
@@ -23,6 +30,73 @@ function Accounts(props) {
         let accounts = new Accts(adapter, store.wallet);
         accounts.handleFile(e);
     };
+
+
+
+
+    // Callback for the madNetAdapter to update the component
+    const adapterCb = (event, data) => {
+        props.states.setUpdateView((updateView) => ++updateView);
+        switch (event) {
+            case 'success':
+                if (data) {
+                    props.states.setNotify(data);;
+                    actions.checkBalances();
+                    return;;
+                }
+                break;;
+            case 'wait':
+                props.states.setLoading(data);;
+                return;;
+            case 'error':
+                props.states.setError(data);;
+                break;;
+            case 'notify':
+                props.states.setBlockModal(data);;
+                break;;
+            case 'view':
+                props.states.setMadnetPanel(data);;
+                break;;
+            default:
+                console.log(event)
+        }
+        props.states.setLoading(false);
+    }
+
+    // Updates for when component mounts or updates
+    React.useEffect(() => {
+        // Reset this component to orginal state
+        if (props.states.refresh) {
+            actions.addMadNetAdapter(false);
+            props.states.setRefresh(false);
+        }
+        // Attempt to setup adapter if not previously instanced
+        if (!store.madNetAdapter && !connectAttempt.current) {
+            connectAttempt.current = true;
+            addAdapter();
+        }
+        if (store.madNetAdapter &&
+            store.settings.madnetProvider !== store.madNetAdapter.provider &&
+            !update.current
+        ) {
+            props.states.setLoading("Connecting to MadNetwork...");
+            update.current = true;
+            addAdapter(true);
+        }
+
+    }, [props, actions, store.madNetAdapter]) // eslint-disable-line react-hooks/exhaustive-deps
+
+    // Add the madNetAdapter and initialize
+    const addAdapter = async (forceConnect) => {
+        if (!store.madNetAdapter ||
+            forceConnect
+        ) {
+            let madNetAdapter = new MadNetAdapter(adapterCb, store.wallet, store.settings.madnetProvider);
+            await madNetAdapter.init()
+            await actions.addMadNetAdapter(madNetAdapter)
+            update.current = false;
+        }
+    }
 
     // add keystore file to state from adapter
     const handleKeystoreFile = (newData) => {
@@ -139,7 +213,8 @@ function Accounts(props) {
         }
         addPrivKData({ "privK": "", "curve": "" });
         addKeystoreData({ "keystore": false, "password": "" });
-        addChangeKSData({"password": "", "curve": false, "keystore": false });;
+        addChangeKSData({ "password": "", "curve": false, "keystore": false });;
+        actions.checkBalances();
         props.states.setLoading(false);
     }
 
@@ -150,9 +225,10 @@ function Accounts(props) {
         }
         return store.wallet.Account.accounts.map(function (e, i) {
             return (
-                <Segment.Group className="segment-card" compact={true} key={i} raised>
+                <Segment.Group size="small" className="segment-card" compact={true} key={i} raised>
                     <Segment textAlign="left">Address: 0x{e.address}<Icon name="copy outline" className="click" onClick={() => props.states.copyText("0x" + e.address)} /></Segment>
                     <Segment textAlign="left">Curve: {e.curve === 1 ? "SECP" : "BN"}</Segment>
+                    <Segment textAlign="left"><BalanceDisplay address={e.address} /></Segment>
                 </Segment.Group>
             )
 
@@ -173,10 +249,10 @@ function Accounts(props) {
                             <Grid centered>
                                 <Form>
                                     <Form.Field>
-                                    <Input type="password" onChange={(event) => { handleChangeCreateKS(event, "password") }} value={changeKSData["password"] || ""} placeholder="Password"></Input>
+                                        <Input type="password" onChange={(event) => { handleChangeCreateKS(event, "password") }} value={changeKSData["password"] || ""} placeholder="Password"></Input>
                                     </Form.Field>
                                     <Form.Field>
-                                    <Input type="password" onChange={(event) => { handleChangeCreateKS(event, "passwordConfirm") }} value={changeKSData["passwordConfirm"] || ""} placeholder="Confirm Password"></Input>
+                                        <Input type="password" onChange={(event) => { handleChangeCreateKS(event, "passwordConfirm") }} value={changeKSData["passwordConfirm"] || ""} placeholder="Confirm Password"></Input>
                                     </Form.Field>
                                     <Form.Group className="switch" inline>
                                         <label>BN Address</label>
@@ -203,8 +279,8 @@ function Accounts(props) {
 
                 <Grid.Row centered>
                     <Segment raised placeholder textAlign="center">
-                    <Button floated="right" onClick={() => setOpen(true)} className="green">Create Keystore</Button>
-                    <Divider/>
+                        <Button floated="right" onClick={() => setOpen(true)} className="green">Create Keystore</Button>
+                        <Divider />
                         <Grid columns={2} relaxed='very' stackable>
                             <Grid.Column>
                                 <Form>

@@ -92,7 +92,21 @@ h1, h2, h3 {
   color:#FF6FFD !important;
 }
 
+.ui.header {
+  color: #f0ece2 !important;
+}
+
+.sub.header {
+  color: #d0cbe2 !important;
+}
+
 .ui.segments:not(.horizontal)>.segment:first-child, .ui.segments:not(.horizontal)>.segment:last-child, .notifySegments {
+  background: #95D8DE !important;
+  background-color: #95D8DE !important;
+  color: #212121 !important;
+}
+
+.ui.segments:not(.horizontal)>.segment:nth-child(2), .ui.segments:not(.horizontal)>.segment:last-child, .notifySegments {
   background: #95D8DE !important;
   background-color: #95D8DE !important;
   color: #212121 !important;
