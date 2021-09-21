@@ -133,7 +133,7 @@ function MadNet(props) {
                         onClick={() => props.states.setMadnetPanel("transaction")}
                     />
                     <Menu.Item
-                        name="prevTx"
+                        name="Previous Tx"
                         active={props.states.activeMadnetPanel === 'prevTx'}
                         onClick={() => props.states.setMadnetPanel("prevTx")}
                     />
